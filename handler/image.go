@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	"net/http"
 
@@ -20,7 +21,7 @@ func NewImageHandler(imageUc usecase.ImageUsecase) imageHandler {
 
 func (h *imageHandler) ProcessImage(c *gin.Context) {
 	var req dto.ImageRequest
-	if err := c.ShouldBind(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -33,7 +34,18 @@ func (h *imageHandler) ProcessImage(c *gin.Context) {
 	defer file.Close()
 
 	bufReader := bufio.NewReader(file)
+	buf, err := io.ReadAll(bufReader)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	imgResult, err := h.imageUc.ProcessImage(c.Request.Context(), buf, req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	c.Status(http.StatusCreated)
-	io.Copy(c.Writer, bufReader)
+	io.Copy(c.Writer, bytes.NewReader(imgResult))
 }
