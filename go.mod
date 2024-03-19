@@ -2,7 +2,10 @@ module github.com/rizqo46/image-processing-go
 
 go 1.21.3
 
-require github.com/gin-gonic/gin v1.9.1
+require (
+	github.com/gin-gonic/gin v1.9.1
+	github.com/go-playground/assert/v2 v2.2.0
+)
 
 require (
 	github.com/kr/pretty v0.3.0 // indirect

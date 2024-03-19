@@ -36,5 +36,9 @@ func (r Resize) Validate() error {
 }
 
 func (r ImageRequest) Validate() error {
+	if r.File == nil {
+		return fmt.Errorf("form filed named file should be provided")
+	}
+
 	return r.Resize.Validate()
 }
