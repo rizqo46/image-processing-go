@@ -26,6 +26,12 @@ func (h *imageHandler) ProcessImage(c *gin.Context) {
 		return
 	}
 
+	err := req.Validate()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	file, err := req.File.Open()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -22,17 +22,18 @@ func (uc ImageUsecase) ProcessImage(ctx context.Context, imageByte []byte, req d
 
 	interpolationMethod := gocv.InterpolationCubic
 
-	newImage := gocv.NewMat()
-	gocv.Resize(img, &newImage, image.Pt(req.Width, req.Height), 0, 0, interpolationMethod)
+	if !req.Resize.IsNoResize() {
+		newImage := gocv.NewMat()
+		gocv.Resize(img, &newImage, image.Pt(req.Width, req.Height), 0, 0, interpolationMethod)
+		img = newImage
+	}
 
 	params := []int{gocv.IMWriteJpegQuality, 96}
-	nativeBuffer, err := gocv.IMEncodeWithParams(gocv.JPEGFileExt, newImage, params)
+	nativeBuffer, err := gocv.IMEncodeWithParams(gocv.JPEGFileExt, img, params)
 	if err != nil {
 		return nil, err
 	}
 
-	defer nativeBuffer.Close()
 	newImgByte := nativeBuffer.GetBytes()
-
 	return newImgByte, nil
 }
