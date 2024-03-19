@@ -1,14 +1,17 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/rizqo46/image-processing-go/handler"
+	"github.com/rizqo46/image-processing-go/usecase"
+)
 
 func main() {
+	imageUsecase := usecase.NewImageUsecase()
+	imageHandler := handler.NewImageHandler(imageUsecase)
+
 	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello",
-		})
-	})
+	r.POST("/", imageHandler.ProcessImage)
 
 	r.Run(":10000")
 }
