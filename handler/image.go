@@ -40,6 +40,21 @@ func (h *imageHandler) ProcessImage(c *gin.Context) {
 	defer file.Close()
 
 	bufReader := bufio.NewReader(file)
+	sniff, err := bufReader.Peek(512)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to detect content type"})
+		return
+	}
+
+	contentType := http.DetectContentType(sniff)
+	if contentType != "image/png" {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{"error": "file type not allowed, only support image/png"},
+		)
+		return
+	}
+
 	buf, err := io.ReadAll(bufReader)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
