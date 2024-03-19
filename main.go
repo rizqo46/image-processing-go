@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/rizqo46/image-processing-go/handler"
+	"github.com/rizqo46/image-processing-go/middleware"
 	"github.com/rizqo46/image-processing-go/usecase"
 )
 
@@ -11,6 +12,7 @@ func main() {
 	imageHandler := handler.NewImageHandler(imageUsecase)
 
 	r := gin.Default()
+	r.Use(middleware.RequestBodyLimiter)
 	r.POST("/", imageHandler.ProcessImage)
 
 	r.Run(":10000")
