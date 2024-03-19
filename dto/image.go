@@ -15,6 +15,12 @@ type Resize struct {
 	Width  int `form:"resizeWidth"`
 }
 
+var (
+	ErrFormFiledNamedFileShouldBeProvided                  = fmt.Errorf("form filed named file should be provided")
+	ErrResizeRequestCannotBeNegativeNumber                 = fmt.Errorf("resizeHeight or resizeHeight cannot be negative number")
+	ErrOneOfResizeParamShouldNotZeroWhenOneOfThemIsNonZero = fmt.Errorf("resizeHeight or resizeHeight should not zero when one of them is non zero")
+)
+
 func (r Resize) IsNoResize() bool {
 	return r.Height == 0 && r.Width == 0
 }
@@ -25,11 +31,11 @@ func (r Resize) Validate() error {
 	}
 
 	if r.Height < 0 || r.Width < 0 {
-		return fmt.Errorf("resizeHeight or resizeHeight cannot be negative number")
+		return ErrResizeRequestCannotBeNegativeNumber
 	}
 
 	if r.Height == 0 || r.Width == 0 {
-		return fmt.Errorf("resizeHeight or resizeHeight should not zero when one of them is non zero")
+		return ErrOneOfResizeParamShouldNotZeroWhenOneOfThemIsNonZero
 	}
 
 	return nil
@@ -37,7 +43,7 @@ func (r Resize) Validate() error {
 
 func (r ImageRequest) Validate() error {
 	if r.File == nil {
-		return fmt.Errorf("form filed named file should be provided")
+		return ErrFormFiledNamedFileShouldBeProvided
 	}
 
 	return r.Resize.Validate()

@@ -3,6 +3,7 @@ package handler
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -19,22 +20,31 @@ func NewImageHandler(imageUc usecase.ImageUsecase) imageHandler {
 	return imageHandler{imageUc: imageUc}
 }
 
+func parseResponseError(err error) gin.H {
+	return gin.H{"error": err.Error()}
+}
+
+var (
+	ErrFailedToDetectContentType = fmt.Errorf("failed to detect content type")
+	ErrFileTypeNotAllowed        = fmt.Errorf("file type not allowed, only support image/png")
+)
+
 func (h *imageHandler) ProcessImage(c *gin.Context) {
 	var req dto.ImageRequest
 	if err := c.Bind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
 		return
 	}
 
 	err := req.Validate()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
 		return
 	}
 
 	file, err := req.File.Open()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
 		return
 	}
 	defer file.Close()
@@ -42,28 +52,25 @@ func (h *imageHandler) ProcessImage(c *gin.Context) {
 	bufReader := bufio.NewReader(file)
 	sniff, err := bufReader.Peek(512)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to detect content type"})
+		c.JSON(http.StatusBadRequest, parseResponseError(ErrFailedToDetectContentType))
 		return
 	}
 
 	contentType := http.DetectContentType(sniff)
 	if contentType != "image/png" {
-		c.JSON(
-			http.StatusBadRequest,
-			gin.H{"error": "file type not allowed, only support image/png"},
-		)
+		c.JSON(http.StatusBadRequest, parseResponseError(ErrFileTypeNotAllowed))
 		return
 	}
 
 	buf, err := io.ReadAll(bufReader)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
 		return
 	}
 
 	imgResult, err := h.imageUc.ProcessImage(c.Request.Context(), buf, req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, parseResponseError(err))
 		return
 	}
 
