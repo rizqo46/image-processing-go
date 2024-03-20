@@ -45,11 +45,6 @@ func (h *imageHandler) PngToJpeg(c *gin.Context) {
 		return
 	}
 
-	if len(req.Files) == 0 {
-		c.JSON(http.StatusBadRequest, parseResponseError(ErrFilesCannotBeEmpty))
-		return
-	}
-
 	images, err := h.imageUc.ValidateAndProcessFilesRequest(req.Files, constants.ContentTypeImagePng)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, parseResponseError(err))
@@ -57,6 +52,36 @@ func (h *imageHandler) PngToJpeg(c *gin.Context) {
 	}
 
 	err = h.imageUc.ConvertPngToJpeg(images)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, parseResponseError(err))
+		return
+	}
+
+	sendImagesRespAsZip(c, images)
+}
+
+func (h *imageHandler) CompressImages(c *gin.Context) {
+	var req dto.FilesRequest
+	if err := c.Bind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	err := req.Validate()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	images, err := h.imageUc.ValidateAndProcessFilesRequest(
+		req.Files, constants.ContentTypeImagePng, constants.ContentTypeImageJpeg,
+	)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	err = h.imageUc.CompressImages(images)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, parseResponseError(err))
 		return

@@ -15,6 +15,7 @@ func main() {
 	r.Use(middleware.RequestBodyLimiter)
 	r.POST("/", imageHandler.ProcessImage)
 	r.POST("/png-to-jpeg", imageHandler.PngToJpeg)
+	r.POST("/compress", imageHandler.CompressImages)
 
 	r.Run(":10000")
 }

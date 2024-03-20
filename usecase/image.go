@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/rizqo46/image-processing-go/constants"
 	"github.com/rizqo46/image-processing-go/dto"
 	"gocv.io/x/gocv"
 )
@@ -80,6 +81,36 @@ func (uc ImageUsecase) ConvertPngToJpeg(req []dto.ImageData) error {
 		}
 
 		req[i].Filename = convretFilenameFromPngToJpeg(req[i].Filename)
+		req[i].ImageBytes = nativeBuffer.GetBytes()
+	}
+
+	return nil
+}
+
+func (uc ImageUsecase) CompressImages(req []dto.ImageData) error {
+	imWriteContentTypeMapping := map[string]gocv.FileExt{
+		constants.ContentTypeImagePng:  gocv.PNGFileExt,
+		constants.ContentTypeImageJpeg: gocv.JPEGFileExt,
+	}
+
+	encodeParamFileExtMapping := map[gocv.FileExt][]int{
+		gocv.PNGFileExt:  {gocv.IMWritePngCompression, 3},
+		gocv.JPEGFileExt: {gocv.IMWriteJpegQuality, 95},
+	}
+
+	for i := range req {
+		img, err := gocv.IMDecode(req[i].ImageBytes, gocv.IMReadUnchanged)
+		if err != nil {
+			return err
+		}
+
+		fileExt := imWriteContentTypeMapping[req[i].ContentType]
+		params := encodeParamFileExtMapping[fileExt]
+		nativeBuffer, err := gocv.IMEncodeWithParams(fileExt, img, params)
+		if err != nil {
+			return err
+		}
+
 		req[i].ImageBytes = nativeBuffer.GetBytes()
 	}
 
