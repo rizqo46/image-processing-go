@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rizqo46/image-processing-go/constants"
 	"github.com/rizqo46/image-processing-go/dto"
 	"github.com/rizqo46/image-processing-go/usecase"
 )
@@ -46,7 +47,7 @@ func (h *imageHandler) PngToJpeg(c *gin.Context) {
 		return
 	}
 
-	images, err := h.imageUc.ValidateAndParseBeforeConvertPngToJpeg(req.Files)
+	images, err := h.imageUc.ValidateAndProcessFilesRequest(req.Files, constants.ContentTypeImagePng)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, parseResponseError(err))
 		return
@@ -54,7 +55,7 @@ func (h *imageHandler) PngToJpeg(c *gin.Context) {
 
 	err = h.imageUc.ConvertPngToJpeg(images)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		c.JSON(http.StatusInternalServerError, parseResponseError(err))
 		return
 	}
 

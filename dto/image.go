@@ -5,9 +5,10 @@ import (
 	"mime/multipart"
 )
 
-type ConvertImagePngToJpegParam struct {
-	Filename   string
-	ImageBytes []byte
+type ImageData struct {
+	Filename    string
+	ContentType string
+	ImageBytes  []byte
 }
 
 type ImageRequest struct {

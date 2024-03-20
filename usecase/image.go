@@ -3,10 +3,12 @@ package usecase
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"image"
 	"io"
 	"mime/multipart"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/rizqo46/image-processing-go/dto"
@@ -19,57 +21,65 @@ func NewImageUsecase() ImageUsecase {
 	return ImageUsecase{}
 }
 
-func convretFilenameFromPngToJpeg(name string) string {
-	return strings.TrimSuffix(name, "png") + "jpeg"
-}
+var (
+	ErrOpenFile          = fmt.Errorf("failed to open a file")
+	ErrReadFile          = fmt.Errorf("failed to read a file")
+	ErrDetectContentType = fmt.Errorf("failed to detect content type")
+)
 
-func (uc ImageUsecase) ValidateAndParseBeforeConvertPngToJpeg(files []*multipart.FileHeader) ([]dto.ConvertImagePngToJpegParam, error) {
-	results := make([]dto.ConvertImagePngToJpegParam, 0, len(files))
+func (uc ImageUsecase) ValidateAndProcessFilesRequest(files []*multipart.FileHeader, allowedContentTypes ...string) ([]dto.ImageData, error) {
+	images := make([]dto.ImageData, 0, len(files))
 	for _, fileHeader := range files {
 		file, err := fileHeader.Open()
 		if err != nil {
-			return nil, err
+			return nil, ErrOpenFile
 		}
 		defer file.Close()
 
 		bufReader := bufio.NewReader(file)
 		sniff, err := bufReader.Peek(512)
 		if err != nil {
-			return nil, err
+			return nil, ErrDetectContentType
 		}
 
 		contentType := http.DetectContentType(sniff)
-		if contentType != "image/png" {
-			return nil, err
+		if slices.Contains(allowedContentTypes, contentType) {
+			return nil, fmt.Errorf("filetype not allowed, only allow %+v", allowedContentTypes)
 		}
 
 		bytes, err := io.ReadAll(bufReader)
 		if err != nil {
-			return nil, err
+			return nil, ErrReadFile
 		}
 
-		results = append(results, dto.ConvertImagePngToJpegParam{
-			Filename:   convretFilenameFromPngToJpeg(fileHeader.Filename),
-			ImageBytes: bytes,
+		images = append(images, dto.ImageData{
+			Filename:    fileHeader.Filename,
+			ContentType: contentType,
+			ImageBytes:  bytes,
 		})
 	}
 
-	return results, nil
+	return images, nil
 }
 
-func (uc ImageUsecase) ConvertPngToJpeg(req []dto.ConvertImagePngToJpegParam) error {
+func convretFilenameFromPngToJpeg(name string) string {
+	return strings.TrimSuffix(name, "png") + "jpeg"
+}
+
+func (uc ImageUsecase) ConvertPngToJpeg(req []dto.ImageData) error {
 	for i := range req {
 		img, err := gocv.IMDecode(req[i].ImageBytes, gocv.IMReadAnyColor)
 		if err != nil {
 			return err
 		}
 
-		params := []int{gocv.IMWriteJpegQuality, 95}
+		params := []int{gocv.IMWriteJpegQuality, 100}
 		nativeBuffer, err := gocv.IMEncodeWithParams(gocv.JPEGFileExt, img, params)
 		if err != nil {
 			return err
 		}
 
+		req[i].Filename = convretFilenameFromPngToJpeg(req[i].Filename)
 		req[i].ImageBytes = nativeBuffer.GetBytes()
 	}
 
