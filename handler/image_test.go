@@ -125,6 +125,27 @@ func Test_imageHandler_CompressImages(t *testing.T) {
 			field:          []formData{},
 			wantStatusCode: http.StatusBadRequest,
 		},
+		{
+			name: "error process image file type not supported",
+			field: []formData{
+				{
+					isTypeFile: true,
+					label:      "files[]",
+					value:      ".././imagetest/text.txt",
+				},
+				{
+					isTypeFile: false,
+					label:      "width[]",
+					value:      "70",
+				},
+				{
+					isTypeFile: false,
+					label:      "height[]",
+					value:      "70",
+				},
+			},
+			wantStatusCode: http.StatusBadRequest,
+		},
 	}
 
 	for _, tt := range tests {
@@ -167,6 +188,27 @@ func Test_imageHandler_Resize(t *testing.T) {
 				},
 			},
 			wantStatusCode: http.StatusCreated,
+		},
+		{
+			name: "error process image file type not supported",
+			field: []formData{
+				{
+					isTypeFile: true,
+					label:      "files[]",
+					value:      ".././imagetest/text.txt",
+				},
+				{
+					isTypeFile: false,
+					label:      "width[]",
+					value:      "70",
+				},
+				{
+					isTypeFile: false,
+					label:      "height[]",
+					value:      "70",
+				},
+			},
+			wantStatusCode: http.StatusBadRequest,
 		},
 		{
 			name:           "error image request not provided",
@@ -215,6 +257,27 @@ func Test_imageHandler_ProcessImage(t *testing.T) {
 				},
 			},
 			wantStatusCode: http.StatusCreated,
+		},
+		{
+			name: "error process image file type not supported",
+			field: []formData{
+				{
+					isTypeFile: true,
+					label:      "files[]",
+					value:      ".././imagetest/cat.jpg",
+				},
+				{
+					isTypeFile: false,
+					label:      "width[]",
+					value:      "70",
+				},
+				{
+					isTypeFile: false,
+					label:      "height[]",
+					value:      "70",
+				},
+			},
+			wantStatusCode: http.StatusBadRequest,
 		},
 		{
 			name:           "error image request not provided",
