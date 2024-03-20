@@ -139,7 +139,7 @@ func httpRequestWithFormData(t *testing.T, httpMethod string, path string, forms
 	}
 
 	mw.Close()
-	req, _ := http.NewRequest(http.MethodPost, "/png-to-jpeg", body)
+	req, _ := http.NewRequest(httpMethod, path, body)
 	req.Header.Add("Content-Type", mw.FormDataContentType())
 	return req
 }
@@ -186,6 +186,44 @@ func Test_imageHandler_PngToJpeg(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			req := httpRequestWithFormData(t, http.MethodPost, "/png-to-jpeg", tt.field...)
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, tt.wantStatusCode, w.Code)
+		})
+	}
+}
+
+func Test_imageHandler_CompressImages(t *testing.T) {
+	router := gin.Default()
+	SetupImageRoute(router)
+
+	var tests = []struct {
+		name           string
+		field          []formData
+		wantStatusCode int
+	}{
+		{
+			name: "success process image",
+			field: []formData{
+				{
+					isTypeFile: true,
+					label:      "files[]",
+					value:      "./image/flower.png",
+				},
+			},
+			wantStatusCode: http.StatusCreated,
+		},
+		{
+			name:           "error image request not provided",
+			field:          []formData{},
+			wantStatusCode: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req := httpRequestWithFormData(t, http.MethodPost, "/compress", tt.field...)
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.wantStatusCode, w.Code)
