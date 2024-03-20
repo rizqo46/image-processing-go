@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"archive/zip"
 	"bufio"
 	"bytes"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +29,53 @@ func parseResponseError(err error) gin.H {
 var (
 	ErrFailedToDetectContentType = fmt.Errorf("failed to detect content type")
 	ErrFileTypeNotAllowed        = fmt.Errorf("file type not allowed, only support image/png")
+	ErrFilesCannotBeEmpty        = fmt.Errorf("files cannot be empty")
 )
+
+func (h *imageHandler) PngToJpeg(c *gin.Context) {
+	var req struct {
+		Files []*multipart.FileHeader `form:"files[]"`
+	}
+	if err := c.Bind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	if len(req.Files) == 0 {
+		c.JSON(http.StatusBadRequest, parseResponseError(ErrFilesCannotBeEmpty))
+		return
+	}
+
+	images, err := h.imageUc.ValidateAndParseBeforeConvertPngToJpeg(req.Files)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	err = h.imageUc.ConvertPngToJpeg(images)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	zipWriter := zip.NewWriter(c.Writer)
+	defer zipWriter.Close()
+
+	for _, image := range images {
+		w, err := zipWriter.Create(image.Filename)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, parseResponseError(err))
+			return
+		}
+
+		if _, err := io.Copy(w, bytes.NewReader(image.ImageBytes)); err != nil {
+			c.JSON(http.StatusInternalServerError, parseResponseError(err))
+			return
+		}
+	}
+
+	c.Status(http.StatusCreated)
+}
 
 func (h *imageHandler) ProcessImage(c *gin.Context) {
 	var req dto.ImageRequest

@@ -5,6 +5,11 @@ import (
 	"mime/multipart"
 )
 
+type ConvertImagePngToJpegParam struct {
+	Filename   string
+	ImageBytes []byte
+}
+
 type ImageRequest struct {
 	File *multipart.FileHeader `form:"file"`
 	Resize

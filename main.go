@@ -14,6 +14,7 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.RequestBodyLimiter)
 	r.POST("/", imageHandler.ProcessImage)
+	r.POST("/png-to-jpeg", imageHandler.PngToJpeg)
 
 	r.Run(":10000")
 }
