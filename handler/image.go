@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -34,10 +33,14 @@ var (
 )
 
 func (h *imageHandler) PngToJpeg(c *gin.Context) {
-	var req struct {
-		Files []*multipart.FileHeader `form:"files[]"`
-	}
+	var req dto.FilesRequest
 	if err := c.Bind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	err := req.Validate()
+	if err != nil {
 		c.JSON(http.StatusBadRequest, parseResponseError(err))
 		return
 	}

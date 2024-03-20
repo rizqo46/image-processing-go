@@ -11,6 +11,18 @@ type ImageData struct {
 	ImageBytes  []byte
 }
 
+type FilesRequest struct {
+	Files []*multipart.FileHeader `form:"files[]"`
+}
+
+func (r FilesRequest) Validate() error {
+	if len(r.Files) == 0 {
+		return fmt.Errorf("files[] cannot be enmpy")
+	}
+
+	return nil
+}
+
 type ImageRequest struct {
 	File *multipart.FileHeader `form:"file"`
 	Resize
