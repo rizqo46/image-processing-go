@@ -270,3 +270,47 @@ func TestImageUsecase_CompressImages(t *testing.T) {
 		})
 	}
 }
+
+func TestImageUsecase_ResizeImages(t *testing.T) {
+	type args struct {
+		req dto.ImageDataResize
+	}
+	tests := []struct {
+		name    string
+		uc      ImageUsecase
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "success compress image",
+			args: args{
+				req: dto.ImageDataResize{
+					ImageDatas: generateImageDatas(t, "./image/flower.png"),
+					ResizeRequest: dto.ResizeRequest{
+						Height: []int{30},
+						Width:  []int{30},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "failed on decode image",
+			args: args{
+				req: dto.ImageDataResize{
+					ImageDatas:    []dto.ImageData{{}},
+					ResizeRequest: dto.ResizeRequest{Height: []int{1}, Width: []int{1}},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			uc := ImageUsecase{}
+			if err := uc.ResizeImages(tt.args.req); (err != nil) != tt.wantErr {
+				t.Errorf("ImageUsecase.ResizeImages() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
