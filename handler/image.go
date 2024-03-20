@@ -3,7 +3,6 @@ package handler
 import (
 	"archive/zip"
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -25,12 +24,6 @@ func NewImageHandler(imageUc usecase.ImageUsecase) imageHandler {
 func parseResponseError(err error) gin.H {
 	return gin.H{"error": err.Error()}
 }
-
-var (
-	ErrFailedToDetectContentType = fmt.Errorf("failed to detect content type")
-	ErrFileTypeNotAllowed        = fmt.Errorf("file type not allowed, only support image/png")
-	ErrFilesCannotBeEmpty        = fmt.Errorf("files cannot be empty")
-)
 
 func (h *imageHandler) PngToJpeg(c *gin.Context) {
 	var req dto.FilesRequest
