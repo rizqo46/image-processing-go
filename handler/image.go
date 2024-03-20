@@ -91,6 +91,41 @@ func (h *imageHandler) CompressImages(c *gin.Context) {
 	sendImagesRespAsZip(c, images)
 }
 
+func (h *imageHandler) ResizeImages(c *gin.Context) {
+	var req dto.FilesResizeRequest
+	if err := c.Bind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	err := req.Validate()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	images, err := h.imageUc.ValidateAndProcessFilesRequest(
+		req.Files, constants.ContentTypeImagePng, constants.ContentTypeImageJpeg,
+	)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, parseResponseError(err))
+		return
+	}
+
+	imageDataResize := dto.ImageDataResize{
+		ResizeRequest: req.ResizeRequest,
+		ImageDatas:    images,
+	}
+
+	err = h.imageUc.ResizeImages(imageDataResize)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, parseResponseError(err))
+		return
+	}
+
+	sendImagesRespAsZip(c, imageDataResize.ImageDatas)
+}
+
 func sendImagesRespAsZip(c *gin.Context, images []dto.ImageData) {
 	zipWriter := zip.NewWriter(c.Writer)
 	defer zipWriter.Close()

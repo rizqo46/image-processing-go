@@ -117,6 +117,34 @@ func (uc ImageUsecase) CompressImages(req []dto.ImageData) error {
 	return nil
 }
 
+func (uc ImageUsecase) ResizeImages(req dto.ImageDataResize) error {
+	imWriteContentTypeMapping := map[string]gocv.FileExt{
+		constants.ContentTypeImagePng:  gocv.PNGFileExt,
+		constants.ContentTypeImageJpeg: gocv.JPEGFileExt,
+	}
+
+	for i := range req.ImageDatas {
+		img, err := gocv.IMDecode(req.ImageDatas[i].ImageBytes, gocv.IMReadUnchanged)
+		if err != nil {
+			return err
+		}
+
+		interpolationMethod := gocv.InterpolationCubic
+		newImage := gocv.NewMat()
+		gocv.Resize(img, &newImage, image.Pt(req.Width[i], req.Height[i]), 0, 0, interpolationMethod)
+
+		fileExt := imWriteContentTypeMapping[req.ImageDatas[i].ContentType]
+		nativeBuffer, err := gocv.IMEncode(fileExt, newImage)
+		if err != nil {
+			return err
+		}
+
+		req.ImageDatas[i].ImageBytes = nativeBuffer.GetBytes()
+	}
+
+	return nil
+}
+
 func (uc ImageUsecase) ProcessImage(ctx context.Context, imageByte []byte, req dto.ImageRequest) ([]byte, error) {
 	img, err := gocv.IMDecode(imageByte, gocv.IMReadAnyColor)
 	if err != nil {
