@@ -66,7 +66,7 @@ func Test_imageHandler_PngToJpeg(t *testing.T) {
 				{
 					isTypeFile: true,
 					label:      "files[]",
-					value:      "./image/flower.png",
+					value:      ".././imagetest/flower.png",
 				},
 			},
 			wantStatusCode: http.StatusCreated,
@@ -82,7 +82,7 @@ func Test_imageHandler_PngToJpeg(t *testing.T) {
 				{
 					isTypeFile: true,
 					label:      "files[]",
-					value:      "./image/cat.jpg",
+					value:      ".././imagetest/cat.jpg",
 				},
 			},
 			wantStatusCode: http.StatusBadRequest,
@@ -115,7 +115,7 @@ func Test_imageHandler_CompressImages(t *testing.T) {
 				{
 					isTypeFile: true,
 					label:      "files[]",
-					value:      "./image/flower.png",
+					value:      ".././imagetest/flower.png",
 				},
 			},
 			wantStatusCode: http.StatusCreated,
@@ -153,7 +153,7 @@ func Test_imageHandler_Resize(t *testing.T) {
 				{
 					isTypeFile: true,
 					label:      "files[]",
-					value:      "./image/flower.png",
+					value:      ".././imagetest/flower.png",
 				},
 				{
 					isTypeFile: false,

@@ -67,7 +67,7 @@ func TestImageUsecase_ValidateAndProcessFilesRequest(t *testing.T) {
 		{
 			name: "success validate and process files",
 			args: args{
-				files:               createMultipartFileheaders("./image/flower.png"),
+				files:               createMultipartFileheaders(".././imagetest/flower.png"),
 				allowedContentTypes: []string{constants.ContentTypeImagePng},
 			},
 			want: []dto.ImageData{
@@ -79,7 +79,7 @@ func TestImageUsecase_ValidateAndProcessFilesRequest(t *testing.T) {
 		{
 			name: "failed content type not allowed",
 			args: args{
-				files:               createMultipartFileheaders("./image/cat.jpg"),
+				files:               createMultipartFileheaders(".././imagetest/cat.jpg"),
 				allowedContentTypes: []string{constants.ContentTypeImagePng},
 			},
 			want:    []dto.ImageData{},
@@ -151,7 +151,7 @@ func TestImageUsecase_ConvertPngToJpeg(t *testing.T) {
 		{
 			name: "success convert image from png to jpeg",
 			args: args{
-				req: generateImageDatas(t, "./image/flower.png"),
+				req: generateImageDatas(t, ".././imagetest/flower.png"),
 			},
 			wantErr: false,
 		},
@@ -185,7 +185,7 @@ func TestImageUsecase_CompressImages(t *testing.T) {
 		{
 			name: "success compress image",
 			args: args{
-				req: generateImageDatas(t, "./image/flower.png"),
+				req: generateImageDatas(t, ".././imagetest/flower.png"),
 			},
 			wantErr: false,
 		},
@@ -221,7 +221,7 @@ func TestImageUsecase_ResizeImages(t *testing.T) {
 			name: "success compress image",
 			args: args{
 				req: dto.ImageDataResize{
-					ImageDatas: generateImageDatas(t, "./image/flower.png"),
+					ImageDatas: generateImageDatas(t, ".././imagetest/flower.png"),
 					ResizeRequest: dto.ResizeRequest{
 						Height: []int{30},
 						Width:  []int{30},
