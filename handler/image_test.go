@@ -185,3 +185,51 @@ func Test_imageHandler_Resize(t *testing.T) {
 		})
 	}
 }
+
+func Test_imageHandler_ProcessImage(t *testing.T) {
+	router := gin.Default()
+	SetupImageRoute(router)
+
+	var tests = []struct {
+		name           string
+		field          []formData
+		wantStatusCode int
+	}{
+		{
+			name: "success process image",
+			field: []formData{
+				{
+					isTypeFile: true,
+					label:      "files[]",
+					value:      ".././imagetest/flower.png",
+				},
+				{
+					isTypeFile: false,
+					label:      "width[]",
+					value:      "70",
+				},
+				{
+					isTypeFile: false,
+					label:      "height[]",
+					value:      "70",
+				},
+			},
+			wantStatusCode: http.StatusCreated,
+		},
+		{
+			name:           "error image request not provided",
+			field:          []formData{},
+			wantStatusCode: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req := httpRequestWithFormData(t, http.MethodPost, "/", tt.field...)
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, tt.wantStatusCode, w.Code)
+		})
+	}
+}
