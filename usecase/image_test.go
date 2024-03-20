@@ -174,3 +174,56 @@ func TestImageUsecase_ValidateAndProcessFilesRequest(t *testing.T) {
 
 	}
 }
+
+func generateImageDatas(t *testing.T, filePaths ...string) []dto.ImageData {
+	images := make([]dto.ImageData, 0, len(filePaths))
+	for _, filePath := range filePaths {
+		file, err := os.ReadFile(filePath)
+		if err != nil {
+			t.Errorf("failed to open file %v", err)
+			return nil
+		}
+
+		images = append(images, dto.ImageData{
+			Filename:   filePath,
+			ImageBytes: file,
+		})
+
+	}
+
+	return images
+}
+
+func TestImageUsecase_ConvertPngToJpeg(t *testing.T) {
+	type args struct {
+		req []dto.ImageData
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "success convert image from png to jpeg",
+			args: args{
+				req: generateImageDatas(t, "./image/flower.png"),
+			},
+			wantErr: false,
+		},
+		{
+			name: "failed on decode image",
+			args: args{
+				req: []dto.ImageData{{}},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			uc := ImageUsecase{}
+			if err := uc.ConvertPngToJpeg(tt.args.req); (err != nil) != tt.wantErr {
+				t.Errorf("ImageUsecase.ConvertPngToJpeg() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
