@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"image"
 	"io"
@@ -145,26 +144,25 @@ func (uc ImageUsecase) ResizeImages(req dto.ImageDataResize) error {
 	return nil
 }
 
-func (uc ImageUsecase) ProcessImage(ctx context.Context, imageByte []byte, req dto.ImageRequest) ([]byte, error) {
-	img, err := gocv.IMDecode(imageByte, gocv.IMReadAnyColor)
-	if err != nil {
-		return nil, err
-	}
+func (uc ImageUsecase) ProcessImages(req dto.ImageDataResize) error {
+	for i := range req.ImageDatas {
+		img, err := gocv.IMDecode(req.ImageDatas[i].ImageBytes, gocv.IMReadUnchanged)
+		if err != nil {
+			return err
+		}
 
-	interpolationMethod := gocv.InterpolationCubic
-
-	if !req.Resize.IsNoResize() {
+		interpolationMethod := gocv.InterpolationCubic
 		newImage := gocv.NewMat()
-		gocv.Resize(img, &newImage, image.Pt(req.Width, req.Height), 0, 0, interpolationMethod)
-		img = newImage
+		gocv.Resize(img, &newImage, image.Pt(req.Width[i], req.Height[i]), 0, 0, interpolationMethod)
+
+		params := []int{gocv.IMWriteJpegQuality, 100}
+		nativeBuffer, err := gocv.IMEncodeWithParams(gocv.JPEGFileExt, img, params)
+		if err != nil {
+			return err
+		}
+
+		req.ImageDatas[i].ImageBytes = nativeBuffer.GetBytes()
 	}
 
-	params := []int{gocv.IMWriteJpegQuality, 96}
-	nativeBuffer, err := gocv.IMEncodeWithParams(gocv.JPEGFileExt, img, params)
-	if err != nil {
-		return nil, err
-	}
-
-	newImgByte := nativeBuffer.GetBytes()
-	return newImgByte, nil
+	return nil
 }

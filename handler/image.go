@@ -2,7 +2,6 @@ package handler
 
 import (
 	"archive/zip"
-	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -153,7 +152,7 @@ func sendImagesRespAsZip(c *gin.Context, images []dto.ImageData) {
 }
 
 func (h *imageHandler) ProcessImage(c *gin.Context) {
-	var req dto.ImageRequest
+	var req dto.FilesResizeRequest
 	if err := c.Bind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, parseResponseError(err))
 		return
@@ -165,38 +164,24 @@ func (h *imageHandler) ProcessImage(c *gin.Context) {
 		return
 	}
 
-	file, err := req.File.Open()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, parseResponseError(err))
-		return
-	}
-	defer file.Close()
-
-	bufReader := bufio.NewReader(file)
-	sniff, err := bufReader.Peek(512)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, parseResponseError(ErrFailedToDetectContentType))
-		return
-	}
-
-	contentType := http.DetectContentType(sniff)
-	if contentType != "image/png" {
-		c.JSON(http.StatusBadRequest, parseResponseError(ErrFileTypeNotAllowed))
-		return
-	}
-
-	buf, err := io.ReadAll(bufReader)
+	images, err := h.imageUc.ValidateAndProcessFilesRequest(
+		req.Files, constants.ContentTypeImagePng,
+	)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, parseResponseError(err))
 		return
 	}
 
-	imgResult, err := h.imageUc.ProcessImage(c.Request.Context(), buf, req)
+	imageDataResize := dto.ImageDataResize{
+		ResizeRequest: req.ResizeRequest,
+		ImageDatas:    images,
+	}
+	err = h.imageUc.ProcessImages(imageDataResize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, parseResponseError(err))
 		return
 	}
 
 	c.Status(http.StatusCreated)
-	io.Copy(c.Writer, bytes.NewReader(imgResult))
+	sendImagesRespAsZip(c, imageDataResize.ImageDatas)
 }
