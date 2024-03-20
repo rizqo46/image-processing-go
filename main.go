@@ -12,5 +12,5 @@ func main() {
 
 	handler.SetupImageRoute(r)
 
-	r.Run(":10000")
+	_ = r.Run(":10000")
 }

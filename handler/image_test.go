@@ -26,7 +26,7 @@ func httpRequestWithFormData(t *testing.T, httpMethod string, path string, forms
 	for _, formData := range formsData {
 		if !formData.isTypeFile {
 			ff, _ := mw.CreateFormField(formData.label)
-			ff.Write([]byte(formData.value))
+			_, _ = ff.Write([]byte(formData.value))
 			continue
 		}
 
