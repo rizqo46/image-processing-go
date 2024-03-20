@@ -59,6 +59,10 @@ func (h *imageHandler) PngToJpeg(c *gin.Context) {
 		return
 	}
 
+	sendImagesRespAsZip(c, images)
+}
+
+func sendImagesRespAsZip(c *gin.Context, images []dto.ImageData) {
 	zipWriter := zip.NewWriter(c.Writer)
 	defer zipWriter.Close()
 
