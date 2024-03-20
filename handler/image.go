@@ -58,6 +58,7 @@ func (h *imageHandler) PngToJpeg(c *gin.Context) {
 		return
 	}
 
+	c.Status(http.StatusCreated)
 	sendImagesRespAsZip(c, images)
 }
 
@@ -88,6 +89,7 @@ func (h *imageHandler) CompressImages(c *gin.Context) {
 		return
 	}
 
+	c.Status(http.StatusCreated)
 	sendImagesRespAsZip(c, images)
 }
 
@@ -123,6 +125,7 @@ func (h *imageHandler) ResizeImages(c *gin.Context) {
 		return
 	}
 
+	c.Status(http.StatusCreated)
 	sendImagesRespAsZip(c, imageDataResize.ImageDatas)
 }
 
@@ -147,8 +150,6 @@ func sendImagesRespAsZip(c *gin.Context, images []dto.ImageData) {
 			return
 		}
 	}
-
-	c.Status(http.StatusCreated)
 }
 
 func (h *imageHandler) ProcessImage(c *gin.Context) {
