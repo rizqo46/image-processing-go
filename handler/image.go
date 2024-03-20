@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rizqo46/image-processing-go/constants"
@@ -94,8 +95,13 @@ func sendImagesRespAsZip(c *gin.Context, images []dto.ImageData) {
 	zipWriter := zip.NewWriter(c.Writer)
 	defer zipWriter.Close()
 
+	now := time.Now()
 	for _, image := range images {
-		w, err := zipWriter.Create(image.Filename)
+		w, err := zipWriter.CreateHeader(&zip.FileHeader{
+			Name:     image.Filename,
+			Method:   zip.Deflate,
+			Modified: now,
+		})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, parseResponseError(err))
 			return
