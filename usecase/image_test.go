@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/go-playground/assert/v2"
@@ -178,6 +179,13 @@ func TestImageUsecase_ValidateAndProcessFilesRequest(t *testing.T) {
 func generateImageDatas(t *testing.T, filePaths ...string) []dto.ImageData {
 	images := make([]dto.ImageData, 0, len(filePaths))
 	for _, filePath := range filePaths {
+		contentType := ""
+		if strings.HasSuffix(filePath, ".png") {
+			contentType = constants.ContentTypeImagePng
+		} else if strings.HasSuffix(filePath, ".jpg") {
+			contentType = constants.ContentTypeImageJpeg
+		}
+
 		file, err := os.ReadFile(filePath)
 		if err != nil {
 			t.Errorf("failed to open file %v", err)
@@ -185,8 +193,9 @@ func generateImageDatas(t *testing.T, filePaths ...string) []dto.ImageData {
 		}
 
 		images = append(images, dto.ImageData{
-			Filename:   filePath,
-			ImageBytes: file,
+			Filename:    filePath,
+			ContentType: contentType,
+			ImageBytes:  file,
 		})
 
 	}
@@ -223,6 +232,40 @@ func TestImageUsecase_ConvertPngToJpeg(t *testing.T) {
 			uc := ImageUsecase{}
 			if err := uc.ConvertPngToJpeg(tt.args.req); (err != nil) != tt.wantErr {
 				t.Errorf("ImageUsecase.ConvertPngToJpeg() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestImageUsecase_CompressImages(t *testing.T) {
+	type args struct {
+		req []dto.ImageData
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "success compress image",
+			args: args{
+				req: generateImageDatas(t, "./image/flower.png"),
+			},
+			wantErr: false,
+		},
+		{
+			name: "failed on decode image",
+			args: args{
+				req: []dto.ImageData{{}},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			uc := ImageUsecase{}
+			if err := uc.CompressImages(tt.args.req); (err != nil) != tt.wantErr {
+				t.Errorf("ImageUsecase.CompressImages() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
