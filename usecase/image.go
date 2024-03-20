@@ -43,7 +43,7 @@ func (uc ImageUsecase) ValidateAndProcessFilesRequest(files []*multipart.FileHea
 		}
 
 		contentType := http.DetectContentType(sniff)
-		if slices.Contains(allowedContentTypes, contentType) {
+		if !slices.Contains(allowedContentTypes, contentType) {
 			return nil, fmt.Errorf("filetype not allowed, only allow %+v", allowedContentTypes)
 		}
 
