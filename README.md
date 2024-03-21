@@ -28,6 +28,19 @@ make build-and-run
 the server will run on port 8080 by default, export env PORT to run in specific port.
 
 
+## Run using Docker
+
+Build docker localy:
+```
+make docker-build
+```
+
+run docker container:
+```
+docker run -d image-processing-go
+```
+
+
 # How to run unit tests
 
 ```
