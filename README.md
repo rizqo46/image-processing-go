@@ -12,7 +12,7 @@
 # How to Run The Server
 
 ## Run Manual
-This project use OpenCV and [gocv](https://github.com/hybridgroup/gocv) for image processing. I use this [installation](https://github.com/hybridgroup/gocv?tab=readme-ov-file#how-to-install) instruction to install on my local machine. 
+To run manual localy, install dependency first. This project use OpenCV and [gocv](https://github.com/hybridgroup/gocv) for image processing. I use this [installation](https://github.com/hybridgroup/gocv?tab=readme-ov-file#how-to-install) instruction to install on my local machine. 
 
 **Note**: If you run on linux machine and getting error on installation you may need to edit the makefile, check this [issue](https://github.com/hybridgroup/gocv/issues/978) on github fo the instruction.
 
@@ -29,6 +29,7 @@ the server will run on port 8080 by default, export env PORT to run in specific 
 
 
 ## Run using Docker
+No need to install dependency if you run using docker
 
 Build docker localy:
 ```
