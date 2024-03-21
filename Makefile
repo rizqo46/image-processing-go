@@ -14,3 +14,8 @@ test:
 test-view-html:
 	go test ./... -coverprofile=c.out
 	go tool cover -html="c.out"
+
+docker-build:
+	docker build -t image-processing-go .
+
+	
