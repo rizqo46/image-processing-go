@@ -36,6 +36,10 @@ Build docker localy:
 make docker-build
 ```
 
+or you can pull form dockerhub:
+```
+docker pull rizqo46/image-processing-go
+```
 run docker container:
 ```
 docker run -d image-processing-go
