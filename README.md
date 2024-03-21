@@ -51,3 +51,75 @@ to view html coverage
 ```
 make test-view-html
 ```
+
+# API Docs
+Postman API Documentation is provided in [docs](docs)
+
+## End-point: Png to Jpeg
+### Method: POST
+>```
+>{{SERVER}}/png-to-jpeg
+>```
+### Body formdata
+
+|Param|value|Type|
+|---|---|---|
+|files[]|/dir/subdir/flower.png|file|
+|files[]|/dir/.cache/car-967387_1920.png|file|
+
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: Compress
+### Method: POST
+>```
+>{{SERVER}}/compress
+>```
+### Body formdata
+
+|Param|value|Type|
+|---|---|---|
+|files[]|/dir/subdir/car-967387_1920.png|file|
+|files[]|/dir/subdir/cat.jpg|file|
+
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: Resize
+### Method: POST
+>```
+>{{SERVER}}/resize
+>```
+### Body formdata
+
+|Param|value|Type|
+|---|---|---|
+|height[]|90|text|
+|height[]|90|text|
+|width[]|90|text|
+|width[]|90|text|
+|files[]|/dir/subdir/cat.jpg|file|
+|files[]|/dir/subdir/car-967387_1920.png|file|
+
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: Process Image
+Combine 3 Functionalities (Convert png to jpeg, resize, and compress)
+### Method: POST
+>```
+>{{SERVER}}http://localhost:10000
+>```
+### Body formdata
+
+|Param|value|Type|
+|---|---|---|
+|width[]|50|text|
+|width[]|50|text|
+|height[]|80|text|
+|height[]|90|text|
+|files[]|/dir/subdir/flower.png|file|
+|files[]|/dir/.cache/car-967387_1920.png|file|

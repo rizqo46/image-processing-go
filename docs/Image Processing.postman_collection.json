@@ -1,0 +1,178 @@
+{
+	"info": {
+		"_postman_id": "a1f49d3b-55e7-47e6-a017-83e463c46073",
+		"name": "Image Processing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31771039"
+	},
+	"item": [
+		{
+			"name": "Png to Jpeg",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "files[]",
+							"type": "file",
+							"src": "/home/rizqo/Downloads/flower.png"
+						},
+						{
+							"key": "files[]",
+							"type": "file",
+							"src": "/home/rizqo/.cache/.fr-c7yajt/car-967387_1920.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{SERVER}}/png-to-jpeg",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"png-to-jpeg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Compress",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "files[]",
+							"type": "file",
+							"src": "/home/rizqo/Downloads/car-967387_1920.png"
+						},
+						{
+							"key": "files[]",
+							"type": "file",
+							"src": "/home/rizqo/Downloads/cat.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{SERVER}}/compress",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"compress"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Resize",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "height[]",
+							"value": "90",
+							"type": "text"
+						},
+						{
+							"key": "height[]",
+							"value": "90",
+							"type": "text"
+						},
+						{
+							"key": "width[]",
+							"value": "90",
+							"type": "text"
+						},
+						{
+							"key": "width[]",
+							"value": "90",
+							"type": "text"
+						},
+						{
+							"key": "files[]",
+							"type": "file",
+							"src": "/home/rizqo/Downloads/cat.jpg"
+						},
+						{
+							"key": "files[]",
+							"type": "file",
+							"src": "/home/rizqo/Downloads/car-967387_1920.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{SERVER}}/resize",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"resize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Process Image",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "width[]",
+							"value": "50",
+							"type": "text"
+						},
+						{
+							"key": "width[]",
+							"value": "50",
+							"type": "text"
+						},
+						{
+							"key": "height[]",
+							"value": "80",
+							"type": "text"
+						},
+						{
+							"key": "height[]",
+							"value": "90",
+							"type": "text"
+						},
+						{
+							"key": "files[]",
+							"type": "file",
+							"src": "/home/rizqo/Downloads/flower.png"
+						},
+						{
+							"key": "files[]",
+							"type": "file",
+							"src": "/home/rizqo/.cache/.fr-c7yajt/car-967387_1920.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{SERVER}}http://localhost:10000",
+					"protocol": "{{SERVER}}http",
+					"host": [
+						"localhost"
+					],
+					"port": "10000"
+				},
+				"description": "Combine 3 Functionalities (Convert png to jpeg, resize, and compress)"
+			},
+			"response": []
+		}
+	]
+}
