@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flag"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rizqo46/image-processing-go/handler"
@@ -9,13 +9,17 @@ import (
 )
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(middleware.RequestBodyLimiter)
 
 	handler.SetupImageRoute(r)
 
-	port := flag.String("port", "8080", "define custom port")
+	port := "8080"
+	envPort := os.Getenv("PORT")
+	if envPort != "" {
+		port = envPort
+	}
 
-	flag.Parse()
-	_ = r.Run(":" + *port)
+	_ = r.Run(":" + port)
 }
